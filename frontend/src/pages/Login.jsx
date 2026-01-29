@@ -22,7 +22,7 @@ function Login() {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      setError('Veuillez remplir tous les champs');
+      setError('Please fill in all fields');
       return;
     }
 
@@ -36,7 +36,7 @@ function Login() {
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      setSuccess('Connexion réussie!');
+      setSuccess('Login successful!');
       
       setTimeout(() => {
         alert('Dashboard coming soon!');
@@ -46,7 +46,7 @@ function Login() {
       if (err.response?.data?.detail) {
         setError(err.response.data.detail);
       } else {
-        setError('Erreur de connexion. Vérifiez vos identifiants.');
+        setError('Login failed. Please check your credentials.');
       }
     } finally {
       setLoading(false);
@@ -63,8 +63,8 @@ function Login() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Connexion</h1>
-          <p className="text-gray-600 mt-2">Système de Gestion Financière</p>
+          <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
+          <p className="text-gray-600 mt-2">Financial Management System</p>
         </div>
 
         {/* Success Message */}
@@ -104,7 +104,7 @@ function Login() {
           {/* Email Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Adresse Email
+              Email Address
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -117,7 +117,7 @@ function Login() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="votre@email.com"
+                placeholder="you@example.com"
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg outline-none transition focus:ring-2 focus:border-transparent"
                 style={{ 
                   focusRingColor: '#50a1c1'
@@ -137,7 +137,7 @@ function Login() {
           {/* Password Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Mot de passe
+              Password
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -172,10 +172,10 @@ function Login() {
                 className="w-4 h-4 rounded border-gray-300 focus:ring-2"
                 style={{ accentColor: '#50a1c1' }}
               />
-              <span className="ml-2 text-gray-600">Se souvenir de moi</span>
+              <span className="ml-2 text-gray-600">Remember me</span>
             </label>
             <a href="#" className="font-medium hover:underline" style={{ color: '#50a1c1' }}>
-              Mot de passe oublié?
+              Forgot password?
             </a>
           </div>
 
@@ -201,10 +201,10 @@ function Login() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Connexion en cours...
+                Signing in...
               </span>
             ) : (
-              'Se connecter'
+              'Sign In'
             )}
           </button>
         </form>
@@ -215,16 +215,16 @@ function Login() {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">ou</span>
+            <span className="px-2 bg-white text-gray-500">or</span>
           </div>
         </div>
 
         {/* Register Link */}
         <div className="text-center">
           <p className="text-gray-600">
-            Pas encore de compte?{' '}
+            Don't have an account?{' '}
             <a href="#" className="font-semibold hover:underline" style={{ color: '#50a1c1' }}>
-              Créer un compte
+              Create account
             </a>
           </p>
         </div>
