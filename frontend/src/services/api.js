@@ -1,16 +1,10 @@
 import axios from 'axios';
 
-// Python FastAPI backend URL (will be running on port 8000)
-const API_URL = 'http://localhost:8000';
-
 const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: 'YOUR_BACKEND_URL_HERE', // e.g., http://localhost:8000
 });
 
-// Add token to requests automatically
+// Automatically add token to headers if it exists
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -19,10 +13,8 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auth endpoints
 export const authAPI = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
+  login: (data) => api.post('/auth/login', data),
+  register: (data) => api.post('/auth/register', data),
+  updateProfile: (data) => api.put('/auth/profile', data),
 };
-
-export default api;
