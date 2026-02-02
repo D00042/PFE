@@ -50,7 +50,7 @@ function Register() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
@@ -59,22 +59,39 @@ function Register() {
     setError('');
 
     try {
-      await authAPI.register({
+      // 1. Call the API
+      const response = await authAPI.register({
         full_name: formData.fullName,
         email: formData.email,
         password: formData.password,
         role: formData.role
       });
 
+      // 2. Save the Token (so the user is "logged in" automatically)
+      if (response.data.access_token) {
+        localStorage.setItem('token', response.data.access_token);
+      }
+
+      // 3. Save the User Info (so the Profile page doesn't crash)
+      const userToSave = {
+        full_name: formData.fullName,
+        email: formData.email,
+        role: formData.role
+      };
+      localStorage.setItem('user', JSON.stringify(userToSave));
+
       setSuccess(true);
 
+      // 4. Redirect to Profile instead of Login for a better experience
       setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+        navigate('/profile');
+      }, 1500);
 
     } catch (err) {
       if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
+        // If detail is an array (Pydantic error), show the first message
+        const detail = err.response.data.detail;
+        setError(Array.isArray(detail) ? detail[0].msg : detail);
       } else if (err.response?.status === 400) {
         setError('Email already registered');
       } else {
@@ -84,7 +101,6 @@ function Register() {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 animated-bg-container">
       {/* Animated Background Waves */}

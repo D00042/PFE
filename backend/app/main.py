@@ -4,25 +4,36 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from . import models, auth
 from .database import engine, get_db
+from app.routers import password_reset
 
-# Create database tables
+
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="TUI Financial Decision Support API")
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",  # Add this one!
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
 
-# Allow React to connect (CORS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # React dev servers
+    allow_origins=origins,            # Allow our specific origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],               # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],               # Allow all headers
+)
+app.include_router(
+    password_reset.router,
+    prefix="/api/auth",
+    tags=["authentication"]
 )
 
-# Request/Response models
 class UserRegister(BaseModel):
     email: EmailStr
-    name: str
+    full_name: str 
     password: str
     role: str = "Team Member"
 
@@ -38,19 +49,17 @@ class TokenResponse(BaseModel):
 @app.get("/")
 def read_root():
     return {"message": "TUI Financial Decision Support API is running!"}
-
 @app.post("/api/auth/register", response_model=TokenResponse)
 def register(user: UserRegister, db: Session = Depends(get_db)):
     # Check if user exists
     existing_user = db.query(models.User).filter(models.User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
     # Create new user
-    hashed_pw = auth.hash_password(user.password)
+    hashed_pw = auth.get_password_hash(user.password)
     new_user = models.User(
         email=user.email,
-        name=user.name,
+        full_name=user.full_name,
         hashed_password=hashed_pw,
         role=user.role
     )
@@ -58,17 +67,23 @@ def register(user: UserRegister, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    # Create token
     token = auth.create_access_token({"sub": user.email, "role": user.role})
     return {"access_token": token, "token_type": "bearer"}
 
 @app.post("/api/auth/login", response_model=TokenResponse)
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
-    # Find user
     user = db.query(models.User).filter(models.User.email == credentials.email).first()
     if not user or not auth.verify_password(credentials.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Create token
     token = auth.create_access_token({"sub": user.email, "role": user.role})
-    return {"access_token": token, "token_type": "bearer"}
+    
+    # ADD THIS: Return user info so React can save it!
+    return {
+        "access_token": token, 
+        "token_type": "bearer",
+        "full_name": user.full_name,  # Add this
+        "email": user.email,          # Add this
+        "role": user.role             # Add this
+    }
+    

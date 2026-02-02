@@ -16,19 +16,28 @@ function Profile() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    if (currentUser) {
-      setUser(currentUser);
-      setFormData({
-        fullName: currentUser.full_name || '',
-        email: currentUser.email || ''
-      });
-    } else {
+useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      
+      // Check if it exists and isn't the literal string "undefined"
+      if (storedUser && storedUser !== "undefined") {
+        const currentUser = JSON.parse(storedUser);
+        setUser(currentUser);
+        setFormData({
+          fullName: currentUser.full_name || '',
+          email: currentUser.email || ''
+        });
+      } else {
+        // If no data, send them back to login
+        navigate('/login');
+      }
+    } catch (err) {
+      console.error("LocalStorage Parse Error:", err);
+      localStorage.removeItem('user'); // Clean up bad data
       navigate('/login');
     }
   }, [navigate]);
-
   const handleChange = (e) => {
     setFormData({
       ...formData,

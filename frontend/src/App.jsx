@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 
+
 // Helper component to protect private routes
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
